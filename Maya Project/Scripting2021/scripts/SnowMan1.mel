@@ -1,0 +1,136 @@
+float $headRadius = 1;
+float $headTilt = 35;
+float $mouthUp = 0.3;
+float $mouthDepth = -0.5;
+float $headPosition = 5;
+
+float $eyeForward = 0.747;
+float $eyeSpacing = 0.433;
+float $eyeRadius = 0.323;
+
+float $noseRadius = 0.2;
+float $noseHeight = 1;
+float $nosePosition = 4.9;
+float $noseForward = 1.4;
+
+float $tongueRadius = 0.25;
+float $tongueHeight = 0.05;
+float $tonguePositionY = 4.564;
+float $tonguePositionZ = 0.458;
+float $tongueRotationX = 30.884;
+float $tongueScaleZ = 1.5;
+
+float $torsoRadius = 1.25;
+float $torsoPosition = 3.14;
+
+float $pelvisRadius = 1.75;
+float $pelvisPosition = 1;
+
+float $hatBodyRadius = .75;
+float $hatBodyHeight = 1.5;
+float $hatBodyPosition = 6.5;
+
+float $hatBaseRadius = 1.25;
+float $hatBaseHeight = 0.1;
+float $hatBasePosition = 5.75;
+
+float $armRadius = .1;
+float $armHeight = 3;
+float $armPositionX = 1;
+float $armPositionY = 3.4;
+float $armRotationZ = -65;
+
+float $fingerRadius = .05;
+float $fingerHeight = 1;
+float $fingerPositionX = 2.5;
+float $fingerPositionY = 4;
+float $fingerRotationZ = -120;
+
+// Build Head
+polySphere -radius $headRadius -createUVs 0;
+rename "Head_Geo";
+move -r 0 $headPosition 0;
+rotate -r $headTilt 0 0;
+select -r Head_Geo.e[192:195];
+move -r 0 $mouthUp $mouthDepth;
+
+// Build Eye
+polySphere -radius $eyeRadius -createUVs 0 -axis 0 0 1;
+rename "L_Eye_Geo";
+move -absolute $eyeSpacing $headPosition $eyeForward;
+select -r L_Eye_Geo.vtx[381];
+PolySelectTraverse 1;
+move -r 0 0 -0.0781981 ;
+
+// Duplicate Eye
+$eyeSpacing = $eyeSpacing * -2;
+select -r L_Eye_Geo;
+duplicate -rr;
+rename "R_Eye_Geo";
+move -relative $eyeSpacing 0 0;
+
+// Build Nose
+polyCone -radius $noseRadius -height $noseHeight -createUVs 0 -axis 0 0 1;
+rename "Nose_Geo";
+move -absolute 0 $nosePosition $noseForward;
+
+// Build Tongue
+polyCylinder -radius $tongueRadius -height $tongueHeight;
+rename "Tongue_Geo";
+move -absolute 0 $tonguePositionY $tonguePositionZ;
+rotate -absolute $tongueRotationX 0 0;
+scale -absolute 1 1 $tongueScaleZ;
+
+// Build Torso
+polySphere -radius $torsoRadius -createUVs 0;
+rename "Torso_Geo";
+move -absolute 0 $torsoPosition 0;
+
+// Build Pelvis
+polySphere -radius $pelvisRadius -createUVs 0;
+rename "Pelvis_Geo";
+move -absolute 0 $pelvisPosition 0;
+
+// Build Hat Body
+polyCylinder -radius $hatBodyRadius -height $hatBodyHeight -createUVs 0;
+rename "Hat_Body_Geo";
+move -absolute 0 $hatBodyPosition 0;
+
+// Build Hat Base
+polyCylinder -radius $hatBaseRadius -height $hatBaseHeight -createUVs 0;
+rename "Hat_Base_Geo";
+move -absolute 0 $hatBasePosition 0;
+
+// Build Arm
+polyCylinder -radius $armRadius -height $armHeight;
+rename "L_Arm_Geo";
+$armHeight = $armHeight / 2;
+move -a 0 $armHeight 0;
+move -a 0 0 0 L_Arm_Geo.rotatePivot;
+channelBoxCommand -freezeAll;
+move -a $armPositionX $armPositionY 0;
+rotate -a 0 0 $armRotationZ;
+
+// Build Finger
+polyCylinder -radius $fingerRadius -height $fingerHeight;
+rename "L_Finger_Geo";
+$fingerHeight = $fingerHeight / 2;
+move -a 0 $fingerHeight 0;
+move -a 0 0 0 L_Finger_Geo.rotatePivot;
+channelBoxCommand -freezeAll;
+move -a $fingerPositionX $fingerPositionY 0;
+rotate -a 0 0 $fingerRotationZ;
+
+polyUnite -objectPivot -caching 0 L_Finger_Geo L_Arm_Geo;
+delete -constructionHistory;
+rename "L_Arm_Geo";
+
+// Duplicate Arm
+$armPositionX = $armPositionX * -2;
+$armRotationZ = $armRotationZ * -1;
+duplicate -rr;
+rename "R_Arm_Geo";
+move -relative $armPositionX 0 0;
+rotate -a 0 180 0;
+
+delete -all -constructionHistory;
