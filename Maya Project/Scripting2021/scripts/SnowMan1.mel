@@ -4,9 +4,9 @@ float $mouthUp = 0.3;
 float $mouthDepth = -0.5;
 float $headPosition = 5;
 
-float $eyeForward = 0.747;
+float $eyeForward = 0.75;
 float $eyeSpacing = 0.433;
-float $eyeRadius = 0.323;
+float $eyeRadius = 0.25;
 
 float $noseRadius = 0.2;
 float $noseHeight = 1;
