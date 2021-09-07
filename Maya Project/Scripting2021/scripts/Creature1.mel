@@ -1,0 +1,92 @@
+string $objects[];
+string $temp[];
+
+string $head;
+string $headParts[];
+float $head_radius = 1;
+float $head_posX = 0;
+float $head_posY = -.545;
+float $head_posZ = 1.674;
+float $head_rotX = 24;
+float $head_rotY = -26;
+float $head_rotZ = -13;
+
+string $l_eye;
+string $r_eye;
+float $eye_irisSize = .3;
+float $eye_irisDepth = -.5;
+float $eye_posX = .45;
+float $eye_posZ = .888;
+float $eye_scale = .3;
+
+string $torso;
+string $torsoParts[];
+
+string $shoulders;
+float $shoulders_height = 2.5;
+float $shoulders_radius = .5;
+
+// Create Head
+$temp = `polySphere -radius $head_radius`;
+$head = $temp[0];
+stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+
+// Create Left Eye
+$temp = `polyCylinder -subdivisionsZ 1`;
+$l_eye = $temp[0];
+stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+
+// Extrude Iris
+select -r ($l_eye+".f[40:59]");
+polyExtrudeFacet -localScale $eye_irisSize $eye_irisSize $eye_irisSize;
+polyExtrudeFacet;
+move -r 0 $eye_irisDepth 0;
+
+// Position Left Eye
+select -r $l_eye;
+move -r $eye_posX 0 $eye_posZ;
+rotate -r 90 0 0;
+scale -r $eye_scale $eye_scale $eye_scale;
+
+// Duplicate Eye
+select -r $l_eye;
+$temp = `duplicate`;
+$r_eye = $temp[0];
+stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+
+// Position Right Eye
+select -r $r_eye;
+$eye_posX = $eye_posX * -2;
+move -r $eye_posX 0 0;
+
+// Combine Head with eyes
+$temp = `polyUnite -ch 0 $headParts`;
+$head = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Position Head
+select -r $head;
+move -r $head_posX $head_posY $head_posZ;
+rotate -r $head_rotX $head_rotY $head_rotZ;
+
+// Create Torso
+$temp = `polyCylinder -subdivisionsZ 1 -subdivisionsY 3`;
+$torso = $temp[0];
+stringArrayInsertAtIndex(0, $torsoParts, $temp[0]);
+
+// Position Torso
+select -r $torso;
+rotate -r 0 0 -90;
+
+// Extrude Torso Spikes
+select -r ($torso+".f[22]") ($torso+".f[24]") ($torso+".f[26]") ($torso+".f[28]") ($torso+".f[30]");
+polyExtrudeFacet -localTranslateZ 1;
+
+// Create Shoulders
+$temp = `polyCylinder -subdivisionsZ 1 -height $shoulders_height -radius $shoulders_radius`;
+$shoulders = $temp[0];
+stringArrayInsertAtIndex(0, $torsoParts, $temp[0]);
+
+// Position Shoulders
+select -r $shoulders;
+rotate -r 0 0 90;
