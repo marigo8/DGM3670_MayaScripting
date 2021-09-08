@@ -2,7 +2,6 @@ string $objects[];
 string $temp[];
 
 string $head;
-string $headParts[];
 float $head_radius = 1;
 float $head_posX = 0;
 float $head_posY = -.545;
@@ -20,21 +19,97 @@ float $eye_posZ = .888;
 float $eye_scale = .3;
 
 string $torso;
-string $torsoParts[];
+float $spike_length = 1;
+float $spike_taper = .5;
 
 string $shoulders;
-float $shoulders_height = 2.5;
+float $shoulders_height = 2.8;
 float $shoulders_radius = .5;
+
+string $l_arm_01;
+string $l_arm_02;
+string $r_arm_01;
+string $r_arm_02;
+float $arm_01_height = 3;
+float $arm_02_height = 4;
+float $arm_01_radius = .1;
+float $arm_02_radius = .1;
+
+float $l_arm_01_rotX = 6.787;
+float $l_arm_01_rotY = 28.309;
+float $l_arm_01_rotZ = -44.803;
+float $l_arm_02_rotY = -136.179;
+
+float $r_arm_01_rotX = -10.429;
+float $r_arm_01_rotY = 48.142;
+float $r_arm_01_rotZ = 234.122;
+float $r_arm_02_rotY = -124.769;
+
+string $upperHalf;
+float $upperHalf_posY = 2.065;
+
+string $pelvis;
+float $pelvis_radius = .5;
+float $pelvis_height = 1.5;
+float $pelvis_posY = 3.935;
+float $pelvis_posZ = -1.069;
+
+string $l_piston;
+string $r_piston;
+float $piston_radius = .075;
+float $piston_height = 2;
+float $piston_posX = 0.999;
+float $piston_posY = .869;
+float $piston_posZ = -0.513;
+float $piston_rotX = 32.045;
+float $piston_rotY = 3.308;
+float $piston_rotZ = -18.603;
+
+string $l_leg_01;
+string $r_leg_01;
+
+float $leg_01_radius = .1;
+float $leg_01_height = 2.5;
+
+float $l_leg_01_rotY = -43.623;
+float $l_leg_01_rotZ = -79.539;
+
+float $r_leg_01_rotY = 21.296;
+float $r_leg_01_rotZ = 243.905;
+
+string $l_leg_02;
+string $r_leg_02;
+float $leg_02_width = .75;
+float $leg_02_height = 2.25;
+float $leg_02_depth = .75;
+float $leg_02_subdivisions = 3;
+
+float $toe_length = .77;
+float $toe_taper = -.3;
+
+float $l_leg_02_posX = 1.104;
+float $l_leg_02_posY = $leg_02_height/2;
+float $l_leg_02_posZ = 0.591;
+float $l_leg_02_rotX = 0;
+float $l_leg_02_rotY = 14.442;
+float $l_leg_02_rotZ = 0;
+
+float $r_leg_02_posX = -1.442;
+float $r_leg_02_posY = 1.581;
+float $r_leg_02_posZ = -2.826;
+float $r_leg_02_rotX = 67.465;
+float $r_leg_02_rotY = -23.158;
+float $r_leg_02_rotZ = -17.879;
 
 // Create Head
 $temp = `polySphere -radius $head_radius`;
 $head = $temp[0];
-stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Create Left Eye
 $temp = `polyCylinder -subdivisionsZ 1`;
 $l_eye = $temp[0];
-stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Extrude Iris
 select -r ($l_eye+".f[40:59]");
@@ -52,7 +127,7 @@ scale -r $eye_scale $eye_scale $eye_scale;
 select -r $l_eye;
 $temp = `duplicate`;
 $r_eye = $temp[0];
-stringArrayInsertAtIndex(0, $headParts, $temp[0]);
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Position Right Eye
 select -r $r_eye;
@@ -60,8 +135,9 @@ $eye_posX = $eye_posX * -2;
 move -r $eye_posX 0 0;
 
 // Combine Head with eyes
-$temp = `polyUnite -ch 0 $headParts`;
+$temp = `polyUnite -ch 0 $objects`;
 $head = $temp[0];
+clear $objects;
 stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Position Head
@@ -72,7 +148,7 @@ rotate -r $head_rotX $head_rotY $head_rotZ;
 // Create Torso
 $temp = `polyCylinder -subdivisionsZ 1 -subdivisionsY 3`;
 $torso = $temp[0];
-stringArrayInsertAtIndex(0, $torsoParts, $temp[0]);
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Position Torso
 select -r $torso;
@@ -80,13 +156,181 @@ rotate -r 0 0 -90;
 
 // Extrude Torso Spikes
 select -r ($torso+".f[22]") ($torso+".f[24]") ($torso+".f[26]") ($torso+".f[28]") ($torso+".f[30]");
-polyExtrudeFacet -localTranslateZ 1;
+polyExtrudeFacet -localTranslateZ $spike_length;
+scale -r 1 $spike_taper 1;
 
 // Create Shoulders
 $temp = `polyCylinder -subdivisionsZ 1 -height $shoulders_height -radius $shoulders_radius`;
 $shoulders = $temp[0];
-stringArrayInsertAtIndex(0, $torsoParts, $temp[0]);
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
 
 // Position Shoulders
 select -r $shoulders;
 rotate -r 0 0 90;
+
+// Create Left Arm_01
+$temp = `polyCylinder -radius $arm_01_radius -height $arm_01_height`;
+$l_arm_01 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Set Left Arm_01 pivot
+select -r $l_arm_01;
+move -a 0 ($arm_01_height/2) 0;
+move -a 0 0 0 ($l_arm_01+".rotatePivot");
+rotate -r 0 0 -90;
+channelBoxCommand -freezeAll;
+
+// Create Left Arm_02
+$temp = `polyCylinder -radius $arm_02_radius -height $arm_02_height`;
+$l_arm_02 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Set Left Arm_02 pivot
+select -r $l_arm_02;
+move -a 0 ($arm_02_height/2) 0;
+move -a 0 0 0 ($l_arm_02+".rotatePivot");
+rotate -r 0 0 -90;
+channelBoxCommand -freezeAll;
+
+// Position and Parent Left Arm_02 to Left Arm_01
+select -r $l_arm_02;
+move -r $arm_01_height 0 0;
+parent $l_arm_02 $l_arm_01;
+
+// Duplicate Left Arm
+select -r $l_arm_01;
+$temp = `duplicate -renameChildren`;
+$r_arm_01 = $temp[0];
+$r_arm_02 = $temp[1];
+$objects = stringArrayCatenate($temp, $objects);
+
+// Orient Right Arm
+select -r $r_arm_01;
+rotate -r 0 0 180;
+
+// Pose Left Arm
+select -r $l_arm_01;
+move -a ($shoulders_height/2) 0 0;
+rotate -a $l_arm_01_rotX $l_arm_01_rotY $l_arm_01_rotZ;
+
+select -r $l_arm_02;
+rotate -a 0 $l_arm_02_rotY 0;
+
+// Pose Right Arm
+select -r $r_arm_01;
+move -a ($shoulders_height/-2) 0 0;
+rotate -a $r_arm_01_rotX $r_arm_01_rotY $r_arm_01_rotZ;
+
+select -r $r_arm_02;
+rotate -a 0 $r_arm_02_rotY 0;
+
+// Combine and Position Upper Half
+$temp = `polyUnite -ch 0 $objects`;
+$upperHalf = $temp[0];
+clear $objects;
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+select -r $upperHalf;
+move -r 0 $upperHalf_posY 0;
+
+// Create Pelvis
+$temp = `polyCylinder -radius $pelvis_radius -height $pelvis_height`;
+$pelvis = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Position Pelvis
+select -r $pelvis;
+move -r 0 0 $pelvis_posZ;
+rotate -a 0 0 90;
+
+// Create Left Piston
+$temp = `polyCylinder -radius $piston_radius -height $piston_height`;
+$l_piston = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Position Left Piston
+select -r $l_piston;
+move -r $piston_posX $piston_posY $piston_posZ;
+rotate -a $piston_rotX $piston_rotY $piston_rotZ;
+
+// Create Right Piston
+$temp = `polyCylinder -radius $piston_radius -height $piston_height`;
+$r_piston = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Position Right Piston
+select -r $r_piston;
+move -r ($piston_posX*-1) $piston_posY $piston_posZ;
+rotate -a $piston_rotX $piston_rotY ($piston_rotZ*-1);
+
+// Create Left Leg_01
+$temp = `polyCylinder -radius $leg_01_radius -height $leg_01_height`;
+$l_leg_01 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Set Left Leg_01 pivot
+select -r $l_leg_01;
+move -a 0 ($leg_01_height/2) 0;
+move -a 0 0 0 ($l_leg_01+".rotatePivot");
+rotate -r 0 0 -90;
+channelBoxCommand -freezeAll;
+move -r ($pelvis_height/2) 0 $pelvis_posZ;
+
+// Duplicate Left Leg
+select -r $l_leg_01;
+$temp = `duplicate`;
+$r_leg_01 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Orient Right Leg
+select -r $r_leg_01;
+rotate -r 0 0 180;
+move -a ($pelvis_height/-2) 0 $pelvis_posZ;
+
+// Rotate Legs
+select -r $l_leg_01;
+rotate -a 0 $l_leg_01_rotY $l_leg_01_rotZ;
+select -r $r_leg_01;
+rotate -a 0 $r_leg_01_rotY $r_leg_01_rotZ;
+
+// Combine and Position Upper Half
+$temp = `polyUnite -ch 0 $objects`;
+$upperHalf = $temp[0];
+clear $objects;
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+select -r $upperHalf;
+move -r 0 $pelvis_posY 0;
+
+// Create Left Leg_02
+$temp = `polyCube -width $leg_02_width -height $leg_02_height -depth $leg_02_depth -subdivisionsY $leg_02_subdivisions`;
+$l_leg_02 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Extrude Left Toe
+select -r ($l_leg_02 + ".f[0]");
+polyExtrudeFacet;
+move -r 0 0 $toe_length;
+select -r ($l_leg_02 + ".e[34]");
+move -r 0 $toe_taper 0;
+
+// duplicate Left Leg_02
+select -r $l_leg_02;
+$temp = `duplicate`;
+$r_leg_02 = $temp[0];
+stringArrayInsertAtIndex(0, $objects, $temp[0]);
+
+// Position Left Leg_02
+select -r $l_leg_02;
+move -r $l_leg_02_posX $l_leg_02_posY $l_leg_02_posZ;
+rotate -r $l_leg_02_rotX $l_leg_02_rotY $l_leg_02_rotZ;
+
+// Position Right Leg_02
+select -r $r_leg_02;
+move -r $r_leg_02_posX $r_leg_02_posY $r_leg_02_posZ;
+rotate -r $r_leg_02_rotX $r_leg_02_rotY $r_leg_02_rotZ;
+
+// Combine All
+$temp = `polyUnite -ch 0 $objects`;
+$temp[0] = `rename $temp[0] "Robot_Geo"`;
+$temp[0] = `group -name "Geometry" $temp[0]`;
+move -a 0 0 0 ($temp[0]+".rotatePivot");
+move -a 0 0 0 ($temp[0]+".scalePivot");
