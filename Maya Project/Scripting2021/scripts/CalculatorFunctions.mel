@@ -1,0 +1,35 @@
+/*
+add
+subtract
+multiply
+division
+power
+mean
+median
+mode
+*/
+
+global proc float Add(float $numbers[])
+{
+    float $sum = 0;
+    for($i = 0; $i < size($numbers); $i++)
+    {
+        $sum += $numbers[$i];
+    }
+    
+    return $sum;
+}
+
+global proc float Subtract(float $numbers[])
+{
+    float $diff = $numbers[0];
+    for($i = 1; $i < size($numbers); $i++)
+    {
+        $diff -= $numbers[$i];
+    }
+    
+    return $diff;
+}
+
+Add({45,43,23,40,6,5,3});
+Subtract({2,2,2});
