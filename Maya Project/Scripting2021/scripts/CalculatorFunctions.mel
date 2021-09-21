@@ -9,6 +9,8 @@ median
 mode
 */
 
+float $temp[];
+
 global proc float Add(float $numbers[])
 {
     float $sum = 0;
@@ -31,5 +33,145 @@ global proc float Subtract(float $numbers[])
     return $diff;
 }
 
-Add({45,43,23,40,6,5,3});
-Subtract({2,2,2});
+global proc float Multiply(float $numbers[])
+{
+    float $prod = $numbers[0];
+    for($i = 1; $i < size($numbers); $i++)
+    {
+        $prod *= $numbers[$i];
+    }
+    
+    return $prod;
+}
+
+global proc float Divide(float $numbers[])
+{
+    float $quo = $numbers[0];
+    for($i = 1; $i < size($numbers); $i++)
+    {
+        $quo /= $numbers[$i];
+    }
+    
+    return $quo;
+}
+
+global proc float Power(float $numbers[])
+{
+    float $pow = $numbers[0];
+    for($i = 1; $i < size($numbers); $i++)
+    {
+        $pow = `pow $pow $numbers[$i]`;
+    }
+    
+    return $pow;
+}
+
+global proc float Mean(float $numbers[])
+{
+    float $avg = Add($numbers);
+    
+    $avg /= size($numbers);
+    
+    return $avg;
+}
+
+global proc float[] Median(float $numbers[])
+{
+    $numbers = `sort $numbers`;
+    
+    int $halfway = size($numbers) / 2; // half of array size. Truncates if size is odd.
+    
+    float $avg[];
+    if(size($numbers) % 2 == 0)
+    { // Even size
+        $avg = {$numbers[$halfway - 1], $numbers[$halfway]};
+    }
+    else
+    { // Odd size
+        $avg = {$numbers[$halfway]};
+    }
+    
+    return $avg;
+}
+
+global proc float[] Mode(float $numbers[])
+{
+    // Set up. //
+    $numbers = `sort $numbers`;
+    float $values[];
+    int $count[];
+    
+    $values[0] = $numbers[0];
+    $count[0] = 1;
+    
+    // Count. //
+    for($i = 1, $j = 0; $i < size($numbers); $i++) // Loop through numbers
+    {
+        if($numbers[$i] != $values[$j]) // If current number is not the same as the last...
+        { // Move on to next count.
+            $j++;
+            $values[$j] = $numbers[$i];
+        }
+        $count[$j] += 1; // count this number
+    }
+    
+    // Compare Counts //
+    int $greatest = 0;
+    
+    for($i = 0; $i < size($count); $i++) // Loop through counts.
+    {
+        if($count[$i] > $greatest) // If this count is greater than the last...
+        {
+            $numbers = {}; // reset the return array.
+            $greatest = $count[$i]; // this count is the greatest.
+        }
+        
+        if($count[$i] == $greatest) // If this count is the greatest...
+        {
+            $numbers[size($numbers)] = $values[$i]; // add value to the return array.
+        }
+    }
+    
+    // Return numbers with greatest count(s).
+    return $numbers;
+}
+
+print("Add: 8 + 4 \n\t" + Add({8,4}));
+print("\n");
+
+print("Subtract: 8 - 4 \n\t" + Subtract({8,4}));
+print("\n");
+
+print("Multiply: 8 * 4 \n\t" + Multiply({8,4}));
+print("\n");
+
+print("Divide: 8 / 4 \n\t" + Divide({8,4}));
+print("\n");
+
+print("Power: 8 ^ 4 \n\t" + Power({8,4}));
+print("\n");
+
+print("Mean: 8, 4, 4, 4, 4 \n\t" + Mean({8,4,4,4,4}));
+print("\n");
+
+$temp = Median({7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6});
+print("Median (even): 7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6 \n\t");
+print($temp[0]);
+print(", ");
+print($temp[1]);
+print("\n");
+
+$temp = Median({5, 14, 2, 13, 42, 1, 7, 14, 90});
+print("Median (odd): 5, 14, 2, 13, 42, 1, 7, 14, 90 \n\t" + $temp[0]);
+print("\n");
+
+$temp = Mode({7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6});
+print("Mode (multiple): 7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6 \n\t");
+print($temp[0]);
+print(", ");
+print($temp[1]);
+print("\n");
+
+$temp = Mode({5, 14, 2, 13, 42, 1, 7, 14, 90});
+print("Mode (single): 5, 14, 2, 13, 42, 1, 7, 14, 90 \n\t" + $temp[0]);
+print("\n");
