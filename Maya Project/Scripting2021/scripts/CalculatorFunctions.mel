@@ -13,139 +13,95 @@ float $temp[];
 
 global proc float Add(float $numbers[])
 {
-    print("Add: " + $numbers[0]);
     float $sum = $numbers[0];
     for($i = 1; $i < size($numbers); $i++)
     {
         $sum += $numbers[$i];
-        print(" + " + $numbers[$i]);
     }
-    print(" = " + $sum + "\n");
     
     return $sum;
 }
 
 global proc float Subtract(float $numbers[])
 {
-    print("Subtract: " + $numbers[0]);
     float $diff = $numbers[0];
     for($i = 1; $i < size($numbers); $i++)
     {
         $diff -= $numbers[$i];
-        print(" - " + $numbers[$i]);
     }
-    print(" = " + $diff + "\n");
     
     return $diff;
 }
 
 global proc float Multiply(float $numbers[])
 {
-    print("Multiply: " + $numbers[0]);
     float $prod = $numbers[0];
     for($i = 1; $i < size($numbers); $i++)
     {
         $prod *= $numbers[$i];
-        print(" * " + $numbers[$i]);
     }
     
-    print(" = " + $prod + "\n");
     return $prod;
 }
 
 global proc float Divide(float $numbers[])
 {
-    print("Divide: " + $numbers[0]);
     float $quo = $numbers[0];
     for($i = 1; $i < size($numbers); $i++)
     {
         $quo /= $numbers[$i];
-        print(" / " + $numbers[$i]);
     }
     
-    print(" = " + $quo + "\n");
     return $quo;
 }
 
 global proc float Power(float $numbers[])
 {
-    print("Power: " + $numbers[0]);
     float $pow = $numbers[0];
     for($i = 1; $i < size($numbers); $i++)
     {
         $pow = `pow $pow $numbers[$i]`;
-        print(" ^ " + $numbers[$i]);
     }
     
-    print(" = " + $pow + "\n");
     return $pow;
 }
 
 global proc float Mean(float $numbers[])
 {
-    print("Mean: " + $numbers[0]);
-    for($i = 1; $i < size($numbers); $i++)
-    {
-        print(", " + $numbers[$i]);
-    }
-    print("\n\t");
-    
     float $avg = Add($numbers);
     
-    print("\t");
     $avg = Divide({$avg, size($numbers)});
-    
-    print("\tResult: " + $avg + "\n");
     
     return $avg;
 }
 
-global proc float[] Median(float $numbers[])
+global proc float Median(float $numbers[])
 {
-    print("Median: " + $numbers[0]);
-    for($i = 1; $i < size($numbers); $i++)
-    {
-        print(", " + $numbers[$i]);
-    }
-    print("\n\t");
-    
     $numbers = `sort $numbers`;
     
     int $halfway = size($numbers) / 2; // half of array size. Truncates if size is odd.
     
-    float $avg[];
+    float $avg;
     if(size($numbers) % 2 == 0)
     { // Even size
-        $avg = {$numbers[$halfway - 1], $numbers[$halfway]};
+        $avg = $numbers[$halfway - 1] + $numbers[$halfway];
+        $avg /= 2;
     }
     else
     { // Odd size
-        $avg = {$numbers[$halfway]};
+        $avg = $numbers[$halfway];
     }
-    
-    print("Result: " + $avg[0]);
-    for($i = 1; $i < size($avg); $i++)
-    {
-        print(", " + $avg[$i]);
-    }
-    print("\n");
     
     return $avg;
 }
 
 global proc float[] Mode(float $numbers[])
 {
-    print("Mode: " + $numbers[0]);
-    for($i = 1; $i < size($numbers); $i++)
-    {
-        print(", " + $numbers[$i]);
-    }
-    print("\n\t");
-    
     // Set up. //
     $numbers = `sort $numbers`;
     float $values[];
     int $count[];
+    float $mode[];
     
     $values[0] = $numbers[0];
     $count[0] = 1;
@@ -168,62 +124,36 @@ global proc float[] Mode(float $numbers[])
     {
         if($count[$i] > $greatest) // If this count is greater than the last...
         {
-            $numbers = {}; // reset the return array.
+            $mode = {}; // reset the return array.
             $greatest = $count[$i]; // this count is the greatest.
         }
         
         if($count[$i] == $greatest) // If this count is the greatest...
         {
-            $numbers[size($numbers)] = $values[$i]; // add value to the return array.
+            $mode[size($mode)] = $values[$i]; // add value to the return array.
         }
     }
     
-    print("Result: " + $numbers[0]);
-    for($i = 1; $i < size($numbers); $i++)
-    {
-        print(", " + $numbers[$i]);
-    }
-    print("\n");
-    
     // Return numbers with greatest count(s).
-    return $numbers;
+    return $mode;
 }
 
-print("\n");
 Add({8,4,2});
 
-
-print("\n");
 Subtract({8,4,2});
 
-
-print("\n");
 Multiply({8,4,2});
 
-
-print("\n");
 Divide({8,4,2});
 
-
-print("\n");
 Power({8,4,2});
 
-
-print("\n");
 Mean({8,4,4,4,4});
 
-
-print("\n");
 Median({5, 14, 2, 13, 42, 1, 7, 14, 90});
 
-
-print("\n");
 Median({7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6});
 
-
-print("\n");
 Mode({5, 14, 2, 13, 42, 1, 7, 14, 90});
 
-
-print("\n");
 Mode({7, 8, 9, 6, 4, 2, 1, 12, 1, 10, 10, 6});
