@@ -1,6 +1,7 @@
-global proc Calculate(float $numbers[], string $operation)
+global proc float[] Calculate(float $numbers[], string $operation)
 {
-    string $result = "\n";
+    float $result[];
+    string $printString = "\n";
     switch($operation)
     {
         case "Add":
@@ -12,8 +13,8 @@ global proc Calculate(float $numbers[], string $operation)
         case "Plus":
         case "plus":
         case "+":
-            $result += "Add: " + ExpressionToString($numbers, " + ");
-            $result += Add($numbers);
+            $printString += ExpressionToString("Add", $numbers, " + ");
+            $result[0] = Add($numbers);
             break;
             
         case "Subtract":
@@ -25,8 +26,8 @@ global proc Calculate(float $numbers[], string $operation)
         case "Minus":
         case "minus":
         case "-":
-            $result += "Subtract: " + ExpressionToString($numbers, " - ");
-            $result += Subtract($numbers);
+            $printString += ExpressionToString("Subtract", $numbers, " - ");
+            $result[0] = Subtract($numbers);
             break;
             
         case "Multiply":
@@ -40,8 +41,8 @@ global proc Calculate(float $numbers[], string $operation)
         case "*":
         case "x":
         case "X":
-            $result += "Multiply: " + ExpressionToString($numbers, " * ");
-            $result += Multiply($numbers);
+            $printString += ExpressionToString("Multiply", $numbers, " * ");
+            $result[0] = Multiply($numbers);
             break;
             
         case "Divide":
@@ -51,8 +52,8 @@ global proc Calculate(float $numbers[], string $operation)
         case "Quotient":
         case "quotient":
         case "/":
-            $result += "Divide: " + ExpressionToString($numbers, " / ");
-            $result += Divide($numbers);
+            $printString += ExpressionToString("Divide", $numbers, " / ");
+            $result[0] = Divide($numbers);
             break;
             
         case "Power":
@@ -62,42 +63,45 @@ global proc Calculate(float $numbers[], string $operation)
         case "Pow":
         case "pow":
         case "^":
-            $result += "Power: " + ExpressionToString($numbers, " ^ ");
-            $result += Power($numbers);
+            $printString += ExpressionToString("Power", $numbers, " ^ ");
+            $result[0] = Power($numbers);
             break;
             
         case "Mean":
         case "mean":
         case "Average":
         case "average":
-            $result += "Mean: " + ExpressionToString($numbers, ", ");
-            $result += Mean($numbers);
+            $printString += ExpressionToString("Mean", $numbers, ", ");
+            $result[0] = Mean($numbers);
             break;
             
         case "Median":
         case "median":
         case "Middle":
         case "middle":
-            $result += "Median: " + ExpressionToString($numbers, ", ");
-            $result += Median($numbers);
+            $printString += ExpressionToString("Median", $numbers, ", ");
+            $result[0] = Median($numbers);
             break;
             
         case "Mode":
         case "mode":
-            $result += "Mode: " + ExpressionToString($numbers, ", ");
-            $result += "(" + floatArrayToString(Mode($numbers), ", ") + ")";
+            $printString += ExpressionToString("Mode", $numbers, ", ");
+            $result = Mode($numbers);
             break;
             
         default:
-            $result += "Unrecognized operation: \"" + $operation + "\"";
+            $printString += "Unrecognized operation: \"" + $operation + "\"";
             break;
     }
-    print($result + "\n");
+    $printString += floatArrayToString($result, ", ");
+    print($printString + "\n");
+    return $result;
 }
 
-global proc string ExpressionToString(float $numbers[], string $symbol)
+global proc string ExpressionToString(string $label, float $numbers[], string $symbol)
 {
-    string $result = floatArrayToString($numbers, $symbol);
+    string $result = $label + ": ";
+    $result += floatArrayToString($numbers, $symbol);
     $result += "\n\t= ";
     return $result;
 }
@@ -112,9 +116,10 @@ Calculate({76,342,12}, "Division");
 
 Calculate({2,2,2}, "Pow");
 
-Calculate({4,65,6,2,1}, "Avergag");
 Calculate({234,5643,123,5434,234}, "Average");
 
 Calculate({435,1,34,-65,3,-12}, "middle");
 
 Calculate({4,2,3,6,8,7,5,3,1,3,5,6,8,5,6}, "Mode");
+
+Calculate({4,65,6,2,1}, "Avergag");
