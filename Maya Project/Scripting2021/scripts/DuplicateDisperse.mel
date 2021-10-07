@@ -1,0 +1,24 @@
+global proc string[] DuplicateDisperse(int $amount, float $minX, float $minY, float $minZ, float $maxX, float $maxY, float $maxZ)
+{
+    string $selections[] = `ls -sl`;
+    string $temp[];
+    string $returnSelection[];
+    
+    for($i = 0; $i < size($selections); $i++)
+    {
+        for($j = 0; $j < $amount; $j++)
+        {
+            $temp = duplicate($selections[$i]);
+            $dup = $temp[0];
+            float $x = rand($minX, $maxX);
+            float $y = rand($minY, $maxY);
+            float $z = rand($minZ, $maxZ);
+            move -r $x $y $z $dup;
+            $returnSelection[size($returnSelection)] = $dup;
+        }
+    }
+    select($returnSelection);
+    return $returnSelection;
+}
+
+DuplicateDisperse(100, -3,-1,-3,3,7,3);
